@@ -210,6 +210,27 @@ test('excludes restaurants tagged as closed or disused', () => {
     },
     {
       type: 'node',
+      id: 16,
+      lat: 59.35022,
+      lon: 18.06,
+      tags: { amenity: 'restaurant', name: 'Former restaurant', 'was:amenity': 'restaurant' },
+    },
+    {
+      type: 'node',
+      id: 17,
+      lat: 59.35023,
+      lon: 18.06,
+      tags: { amenity: 'restaurant', name: 'Lifecycle restaurant', 'disused:amenity': 'restaurant' },
+    },
+    {
+      type: 'node',
+      id: 18,
+      lat: 59.35024,
+      lon: 18.06,
+      tags: { amenity: 'restaurant', name: 'Status restaurant', status: 'permanently_closed' },
+    },
+    {
+      type: 'node',
       id: 13,
       lat: 59.35025,
       lon: 18.06,
@@ -225,6 +246,23 @@ test('excludes restaurants tagged as closed or disused', () => {
   ], origin);
 
   assert.deepEqual(restaurants.map(({ name }) => name), ['Open restaurant']);
+});
+
+test('does not treat negative lifecycle tags as closure evidence', () => {
+  const restaurants = mapNearbyRestaurants([{
+    type: 'node',
+    id: 19,
+    lat: 59.3501,
+    lon: 18.06,
+    tags: {
+      amenity: 'restaurant',
+      name: 'Open restaurant with lifecycle tags',
+      disused: 'no',
+      'closed:amenity': 'no',
+    },
+  }], origin);
+
+  assert.deepEqual(restaurants.map(({ name }) => name), ['Open restaurant with lifecycle tags']);
 });
 
 test('uses cuisine-specific fallback imagery and offers a menu search when no menu is tagged', () => {

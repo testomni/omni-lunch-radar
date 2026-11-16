@@ -180,15 +180,33 @@ function toRestaurant(element, origin) {
 }
 
 function isInactiveRestaurant(tags, name) {
-  const isAffirmative = (value) => ['yes', 'true', '1', 'temporary', 'permanent', 'closed', 'permanently_closed', 'temporarily_closed']
-    .includes(String(value ?? '').toLowerCase());
+  const inactiveValues = new Set([
+    'yes',
+    'true',
+    '1',
+    'temporary',
+    'permanent',
+    'closed',
+    'permanently closed',
+    'permanently_closed',
+    'temporarily closed',
+    'temporarily_closed',
+    'closed permanently',
+    'closed_permanently',
+  ]);
+  const isInactiveValue = (value) => inactiveValues.has(String(value ?? '').trim().toLowerCase());
   const hasLifecycleAmenity = ['disused:amenity', 'abandoned:amenity', 'closed:amenity']
-    .some((key) => Boolean(tags[key]));
+    .some((key) => {
+      const value = String(tags[key] ?? '').trim().toLowerCase();
+      return value !== '' && !['no', 'false', '0'].includes(value);
+    });
   const normalizedName = name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 
   return [...permanentlyClosedRestaurantNames].some((closedName) => normalizedName.includes(closedName))
     || hasLifecycleAmenity
-    || ['disused', 'abandoned', 'closed'].some((key) => isAffirmative(tags[key]));
+    || Boolean(tags['was:amenity'])
+    || ['disused', 'abandoned', 'closed', 'permanently_closed', 'permanently:closed', 'status']
+      .some((key) => isInactiveValue(tags[key]));
 }
 
 export function mapNearbyRestaurants(elements, origin) {
