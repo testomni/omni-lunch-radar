@@ -31,6 +31,24 @@ test('matches Google Places by name and proximity, not name alone', () => {
   );
 });
 
+test('matches apostrophe variants so closed Google listings are applied', () => {
+  const restaurant = {
+    name: 'Waynes coffee',
+    latitude: 59.356948,
+    longitude: 17.956732,
+  };
+  const closedGooglePlace = {
+    displayName: { text: "Wayne's Coffee" },
+    location: { latitude: 59.356948, longitude: 17.956732 },
+    businessStatus: 'CLOSED_PERMANENTLY',
+  };
+
+  const match = matchGooglePlace(restaurant, [closedGooglePlace]);
+
+  assert.equal(match, closedGooglePlace);
+  assert.equal(isGooglePlaceClosed(match), true);
+});
+
 test('requests and maps nearby Google reviews and operational status', async () => {
   const originalWindow = globalThis.window;
   let searchRequest;

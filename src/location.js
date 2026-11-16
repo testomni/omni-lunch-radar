@@ -1,6 +1,7 @@
 const restaurantRadiusMeters = 1200;
 export const drivingSearchRadiusMeters = 10_000;
 const permanentlyClosedRestaurantNames = new Set(['drottningholms pizzeria']);
+const inactiveOsmRestaurantIds = new Set(['node/1866052166']);
 const fallbackRestaurantImages = {
   asian: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80',
   burger: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80',
@@ -140,7 +141,12 @@ function getRestaurantAddress(tags) {
 function toRestaurant(element, origin) {
   const coordinates = getCoordinates(element);
   const tags = element.tags ?? {};
-  if (!coordinates || !tags.name || isInactiveRestaurant(tags, tags.name)) return null;
+  if (
+    !coordinates
+    || !tags.name
+    || inactiveOsmRestaurantIds.has(`${element.type}/${element.id}`)
+    || isInactiveRestaurant(tags, tags.name)
+  ) return null;
 
   const distanceMeters = Math.round(getDistanceMeters(origin, coordinates));
   const address = getRestaurantAddress(tags);

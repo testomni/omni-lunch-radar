@@ -265,6 +265,22 @@ test('does not treat negative lifecycle tags as closure evidence', () => {
   assert.deepEqual(restaurants.map(({ name }) => name), ['Open restaurant with lifecycle tags']);
 });
 
+test('excludes the known permanently closed Waynes Coffee OSM listing', () => {
+  const restaurants = mapNearbyRestaurants([{
+    type: 'node',
+    id: 1866052166,
+    lat: 59.356948,
+    lon: 17.956732,
+    tags: {
+      amenity: 'cafe',
+      name: 'Waynes coffee',
+      brand: "Wayne's Coffee",
+    },
+  }], origin);
+
+  assert.deepEqual(restaurants, []);
+});
+
 test('uses cuisine-specific fallback imagery and offers a menu search when no menu is tagged', () => {
   assert.match(getCuisineFallbackImage(['Mexican']), /photo-1552332386-f8dd00dc2f85/);
 
